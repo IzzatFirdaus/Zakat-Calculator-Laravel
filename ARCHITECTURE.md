@@ -43,6 +43,8 @@ app/
 │   └── ZakatCalculator.php                  # pure service: the calculation engine
 ├── Http/
 │   ├── Controllers/CalculatorController.php # index / calculate / about (thin)
+│   ├── Controllers/LanguageController.php   # GET /language: sets the locale cookie, redirects back
+│   ├── Middleware/SetLocale.php             # web locale: cookie > Accept-Language > app.locale
 │   ├── Requests/CalculateZakatRequest.php   # all validation for /calculate
 │   └── Controller.php                       # existing base
 ├── Models/                                  # existing (User only)
@@ -62,11 +64,13 @@ resources/
         └── partials/result.blade.php        # NEW: result partial reused by full page and AJAX fragment
 
 lang/
-└── en/                                      # NEW: all user-facing strings, grouped PHP files
-    ├── about.php  app.php  calculator.php  footer.php  layout.php  meta.php  nav.php
+├── en/                                      # NEW: all user-facing strings, grouped PHP files
+│   ├── about.php  app.php  calculator.php  footer.php  layout.php  meta.php  nav.php
+└── ms/                                      # Malay: same keys (agent-authored, not native-reviewed)
+    └── about.php  app.php  calculator.php  footer.php  layout.php  meta.php  nav.php
 
 routes/
-├── web.php                                  # GET /, POST /calculate, GET /about
+├── web.php                                  # GET /, POST /calculate, GET /about, GET /language
 └── api.php                                  # POST api/v1/calculate (JSON)
 
 tests/
@@ -76,6 +80,7 @@ tests/
 ├── Feature/CalculateWebTest.php              # POST /calculate end to end
 ├── Feature/CalculateApiTest.php              # POST api/v1/calculate (JSON shape)
 ├── Feature/SmokeTest.php                     # page loads, asset wiring
+├── Feature/LocalizationTest.php              # locale resolution, cookie, lang key parity, icon-only toggle
 └── (existing Pest.php, TestCase.php, Example tests, SkillAutomationTest)
 ```
 
@@ -183,7 +188,7 @@ Component responsibilities:
 | `CalculateZakatRequest` | Whitelist + normalize + validate `weight` (≤ 1M), `value` (≤ 10M), `category` (`kept`/`worn`), `currency` (ISO-4217 set). Allowed currency set is a constant (`SUPPORTED_CURRENCIES`). Exposes `toInput()` to build the domain value object. |
 | `ZakatCalculator` | The only place the formula lives. |
 | `calculator.ts` | Progressive enhancement: submit via `fetch`, render result in place, toggle theme into `localStorage`. The page works fully without JS. |
-| Layout + views | All strings read from grouped translation keys backed by `lang/en/*.php`. |
+| Layout + views | All strings read from grouped translation keys backed by `lang/{en,ms}/*.php`. |
 
 ### ASCII dependency graph (review artifact)
 
@@ -209,8 +214,9 @@ Dependencies point inward: controllers depend on the domain; the domain depends 
 | `GET` | `/` | `CalculatorController@index` | Calculator screen (empty state). |
 | `POST` | `/calculate` | `CalculatorController@calculate` | Validates, computes, renders result. No-JS compatible. |
 | `GET` | `/about` | `CalculatorController@about` | Methodology and disclaimer. |
+| `GET` | `/language` | `LanguageController@update` | `?locale=en\|ms` sets the `locale` cookie (`cookie()->forever`, encrypted, httponly, samesite=lax) and redirects back; unsupported values fall back to the current locale. A plain GET form, so it works with JS disabled. |
 
-All `POST` routes use the default `web` middleware group (session, CSRF).
+All `POST` routes use the default `web` middleware group (session, CSRF). `SetLocale` is appended to that group (`bootstrap/app.php`), so the API routes keep `app.locale` and return English messages.
 
 ### 6.2 API routes (`routes/api.php`)
 
@@ -229,7 +235,7 @@ Version prefix `/api/v1` is the standing convention for any future API surface.
 | New env variables | **None.** The app reads no secrets, keys, or feature flags. |
 | `config/` changes | **None.** Domain constants are code, not config. |
 | `.env` | Unchanged from scaffold, except `APP_NAME="Zakat Calculator"` (display only, no logic depends on it). |
-| Locale | `APP_LOCALE=en` (already set). |
+| Locale | `APP_LOCALE=en`, `APP_FALLBACK_LOCALE=en`. The web locale is resolved per request by `SetLocale`: `locale` cookie → `Accept-Language` (matched against `en`, `ms`) → `APP_LOCALE`. The fallback locale makes a missing Malay key render English rather than leak a raw key. |
 | Databases | Local dev SQLite (`DB_CONNECTION=sqlite`, `database/database.sqlite`) exists only because the default Laravel scaffold ships that way; the calculator never queries it. Tests use in-memory SQLite via `.env.testing` / `phpunit.xml`. No domain tables. |
 | Session/cache | `SESSION_DRIVER=file` and `CACHE_STORE=file` are required framework plumbing for CSRF and validation-error flashing on the web POST path (see section 3.4). No product state is stored. |
 
@@ -265,7 +271,14 @@ Parameterized golden tests against the Android reference dataset (section 4.3), 
 
 - `app/Domain/Zakat/**` must not import from any `Illuminate\*` or framework namespace (purity rule).
 
-### 8.6 Quality gates (every change)
+### 8.6 Feature: `LocalizationTest`
+
+- Every `lang/en/*.php` key exists in `lang/ms/*.php` (recursive key-path parity over the seven groups).
+- `GET /language?locale=ms` sets the cookie and redirects back to the referring page; unknown/unsupported values fall back; a missing cookie auto-detects `ms` from `Accept-Language`; the cookie wins over the header.
+- Malay strings render on the page, in the AJAX result partial (with money formatting unchanged), and in validation errors; the JSON API stays English.
+- The theme switcher button contains no text node (icons only, `aria-label` retained).
+
+### 8.7 Quality gates (every change)
 
 `composer fix && composer analyse && composer test` must pass; zero new Larastan errors; Pint clean.
 
@@ -288,6 +301,9 @@ Reading this as: a financial utility for a general audience, government-service 
 | Identity motif | Eight-pointed star (khatam) geometry as the header mark and a thin divider, used sparingly | A quiet Islamic-geometric identity that is specific to the product and not a stock icon (R-20). |
 | Icons | Minimal inline SVGs only where a control needs one (theme toggle, reset) | No icon library dependency; fewer assets, faster page (R-04). |
 | States | Empty, loading, error, and result states all styled explicitly | A form that lacks error/empty states is not finished (R-27). |
+| Meter | Pure-CSS bar; Blade computes `--meter-width` / `--meter-tick` from `BigDecimal`; no animation | The zakatable-vs-uruf split is visible at a glance; geometry is presentation (it never feeds back into the math) and stays server-rendered for the no-JS path. |
+| Money display | `App\Support\MoneyFormatter` (grouped, locale-pinned `en`) in views only; API responses stay raw strings | Server owns formatting so JS never re-formats money; the API stays locale-neutral for future consumers. |
+| CSS architecture | Token / base / component partial chain under `resources/css/`, imported by `app.css`; Tailwind import removed; dependency packages untouched | Per-component files keep the cascade readable; the vendored preflight parity block preserves baseline normalization without the framework import. |
 
 Contrast floor: WCAG AA (4.5:1 text, 3:1 large text). Tap targets >= 44px. All interactive elements keyboard-operable with visible focus (R-03, R-25, R-32). Full design direction gets validated against a written `DESIGN.md` when UI implementation starts.
 
@@ -301,7 +317,7 @@ Contrast floor: WCAG AA (4.5:1 text, 3:1 large text). Tap targets >= 44px. All i
 4. **Controllers are thin.** Each action coerces input via the FormRequest, makes one domain call, and renders/returns; the only branching allowed is the AJAX-vs-full-page render choice in `calculate`. No arithmetic in controllers, ever.
 5. **No persistence, no accounts, no analytics, no telemetry** in v1.0. The calculator never writes to the database, cache, or any external service. The framework session carries only CSRF + flashed validation errors/old input on the no-JS path (section 3.4).
 6. **No network at calculation time.** No live gold price APIs, no third-party scripts, no tracking pixels.
-7. **All user-facing strings are centralized** in grouped language files (`lang/en/*.php`). No hard-coded UI text in Blade or JS.
+7. **All user-facing strings are centralized** in grouped language files (`lang/en/*.php` plus the Malay `lang/ms/*.php`, kept key-for-key in sync by a test). No hard-coded UI text in Blade or JS. Locale affects text only: `app/Domain/Zakat/**` stays locale-free, money stays formatted by `MoneyFormatter` with `en` grouping (Malaysian convention), and the JSON API stays locale-neutral.
 8. **Input bounds are enforced at the request boundary** (weight `<= 1_000_000 g`, value per gram `<= 10_000_000`); the domain additionally guards positivity in `ZakatInput`'s constructor.
 9. **Every POST route is CSRF-protected and validated.** Never trust client-side values; the JS enhancement is cosmetic, not a security boundary.
 10. **No new dependencies** without an architecture review entry in this document.

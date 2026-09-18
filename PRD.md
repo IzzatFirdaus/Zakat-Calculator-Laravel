@@ -57,7 +57,7 @@ This product is a direct web migration of an existing Android app. All v1.0 beha
 - Cash, silver, business assets, debts, livestock, and agricultural produce.
 - User accounts, cloud sync, multi-device history, persistence of past calculations.
 - Real-time or automated gold price feeds (manual entry only), including web scraping or third-party price APIs.
-- Multi-language localization (English only in v1.0; architecture must keep strings centralized).
+- Additional locales beyond English and Malay; the launch interface supports English and Malay with centralized strings.
 - Push or email notifications for Zakat due dates.
 - School-of-thought presets beyond the standard uruf model (Hanafi/Shafi'i variants are future work).
 - The Android "Share App" system share sheet. Sharing is an OS-level affordance with no web equivalent in a stateless calculator; it is explicitly out of scope for this web iteration (no Web Share API button in v1.0).
@@ -82,7 +82,7 @@ This product is a direct web migration of an existing Android app. All v1.0 beha
 | **Reliability** | No errors on empty, negative, or overflow inputs. Graceful, inline validation messaging. |
 | **Offline** | No dependency on third-party services or live price feeds: the user supplies the price, and the calculation runs entirely on the app's own server. |
 | **Compatibility** | Modern evergreen browsers (last 2 versions of Chrome, Edge, Firefox, Safari) and current mobile browsers. |
-| **Localization** | English only at launch; all user-facing strings must be centralized for future externalization. |
+| **Localization** | English and Malay at launch; all user-facing strings are centralized in grouped language files and kept in sync across locales. |
 | **Currency** | Monetary results formatted with the selected ISO-4217 currency, correct minor-unit scale (2 decimals for the supported set). |
 
 ---
