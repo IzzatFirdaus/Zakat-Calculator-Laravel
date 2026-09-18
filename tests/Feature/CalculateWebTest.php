@@ -89,7 +89,7 @@ it('computes a result for a valid POST to /calculate', function () {
 
     $response->assertStatus(200)
         ->assertSee('35.00')
-        ->assertSee('12250.00')
+        ->assertSee('12,250.00')
         ->assertSee('306.25');
 });
 
@@ -105,7 +105,7 @@ it('returns the result partial for AJAX requests', function () {
 
     $response->assertStatus(200)
         ->assertSee('306.25')
-        ->assertSee('12250.00')
+        ->assertSee('12,250.00')
         ->assertSee('35.00');
 });
 
@@ -367,7 +367,7 @@ it('renders high-precision inputs with rounded display values', function () {
 
     $response->assertStatus(200)
         ->assertSee('35.56 g')
-        ->assertSee('12448.69 MYR')
+        ->assertSee('12,448.69 MYR')
         ->assertSee('311.22');
 });
 
@@ -378,4 +378,19 @@ it('never formats money in the browser script', function () {
         ->and($script)->not->toContain('Intl.NumberFormat')
         ->and($script)->not->toContain('parseFloat')
         ->and($script)->not->toContain('parseInt');
+});
+
+it('formats upper-bound results with thousands separators', function () {
+    /** @var TestCase $this */
+    $response = $this->post('/calculate', [
+        'weight' => '1000000',
+        'category' => 'kept',
+        'value' => '350',
+        'currency' => 'MYR',
+    ]);
+
+    $response->assertStatus(200)
+        ->assertSee('999,915.00 g')
+        ->assertSee('349,970,250.00 MYR')
+        ->assertSee('8,749,256.25');
 });

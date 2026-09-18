@@ -1,4 +1,4 @@
-@use('Brick\Math\RoundingMode')
+@use('App\Support\MoneyFormatter')
 
 <h2 class="result-panel__heading" id="result-heading" data-result-heading tabindex="-1">{{ __('calculator.resultHeading') }}</h2>
 
@@ -24,7 +24,7 @@
         </div>
     @else
         <p class="result-amount">
-            {{ $result->zakatDue->toScale(2, RoundingMode::HalfUp) }}
+            {{ MoneyFormatter::format($result->zakatDue) }}
             <span class="result-amount__currency">{{ $result->currencyCode }}</span>
         </p>
         <p class="result-sublabel">{{ __('calculator.resultStatus') }}</p>
@@ -33,19 +33,19 @@
     <dl class="result-list">
         <div class="result-list__row">
             <dt class="result-list__label">{{ __('calculator.urufApplied') }}</dt>
-            <dd class="result-list__value">{{ $result->urufGrams->toScale(2, RoundingMode::HalfUp) }} g</dd>
+            <dd class="result-list__value">{{ MoneyFormatter::format($result->urufGrams) }} g</dd>
         </div>
         <div class="result-list__row">
             <dt class="result-list__label">{{ __('calculator.resultWeightMinusUruf') }}</dt>
-            <dd class="result-list__value">{{ $result->weightMinusUruf->toScale(2, RoundingMode::HalfUp) }} g</dd>
+            <dd class="result-list__value">{{ MoneyFormatter::format($result->weightMinusUruf) }} g</dd>
         </div>
         <div class="result-list__row">
             <dt class="result-list__label">{{ __('calculator.resultPayableValue') }}</dt>
-            <dd class="result-list__value">{{ $result->payableValue->toScale(2, RoundingMode::HalfUp) }} {{ $result->currencyCode }}</dd>
+            <dd class="result-list__value">{{ MoneyFormatter::format($result->payableValue) }} {{ $result->currencyCode }}</dd>
         </div>
         <div class="result-list__row">
             <dt class="result-list__label">{{ __('calculator.resultTotalZakat') }}</dt>
-            <dd class="result-list__value result-list__value--total">{{ $result->zakatDue->toScale(2, RoundingMode::HalfUp) }} {{ $result->currencyCode }}</dd>
+            <dd class="result-list__value result-list__value--total">{{ MoneyFormatter::format($result->zakatDue) }} {{ $result->currencyCode }}</dd>
         </div>
     </dl>
 
