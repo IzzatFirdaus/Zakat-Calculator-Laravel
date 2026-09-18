@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A — Refined Civic</title>
+<style>
+:root{
+  --bg:#f4f2ea; --surface:#fffefa; --raised:#ffffff;
+  --ink:#182220; --muted:#59655d; --line:#dcdfd6; --line-strong:#c3c9bd;
+  --accent:#0b6b57; --accent-ink:#ffffff; --accent-soft:#e4f1eb; --accent-deep:#075847;
+  --danger:#a61b1b; --danger-soft:#fbecec;
+  --r-ctl:.625rem; --r-card:1rem;
+  --shadow:0 1px 2px rgba(24,34,32,.05), 0 12px 32px -12px rgba(24,34,32,.14);
+}
+html[data-theme="dark"]{
+  --bg:#0e1512; --surface:#171f1b; --raised:#1e2823;
+  --ink:#e9efeb; --muted:#9daba2; --line:#2a352f; --line-strong:#3d4a43;
+  --accent:#3fd6a2; --accent-ink:#08120e; --accent-soft:#14332a; --accent-deep:#6ee7b7;
+  --danger:#ff9a9a; --danger-soft:#3a1d1d;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 16px 40px -16px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;min-height:100vh;display:flex;flex-direction:column;background:var(--bg);color:var(--ink);
+  font:16px/1.55 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+.num{font-variant-numeric:tabular-nums}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:4px}
+
+header{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.75rem clamp(1rem,4vw,2.5rem);
+  background:var(--surface);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:.625rem;font-weight:700;letter-spacing:-.01em;text-decoration:none;min-height:44px}
+.brand svg{width:26px;height:26px;color:var(--accent)}
+nav{display:flex;gap:.25rem;align-items:center}
+.navlink{display:inline-flex;align-items:center;min-height:44px;padding:.5rem .875rem;border-radius:var(--r-ctl);
+  font-size:.9rem;font-weight:600;color:var(--muted);text-decoration:none}
+.navlink[aria-current]{color:var(--accent);background:var(--accent-soft)}
+.toggle{min-width:44px;min-height:44px;border:1px solid var(--line-strong);border-radius:var(--r-ctl);background:var(--raised);
+  color:var(--ink);cursor:pointer;font:inherit;font-weight:600;padding:.5rem .75rem}
+.toggle:hover{border-color:var(--accent)}
+
+main{flex:1;width:min(100%,74rem);margin:0 auto;padding:clamp(1.5rem,5vw,3.5rem) clamp(1rem,4vw,2.5rem)}
+.intro{max-width:44rem;margin-bottom:2rem}
+.intro h1{margin:0;font-size:clamp(1.9rem,4.5vw,2.9rem);font-weight:700;letter-spacing:-.025em;line-height:1.1}
+.intro p{margin:.625rem 0 0;color:var(--muted)}
+
+.grid{display:grid;gap:1.25rem;align-items:start}
+@media(min-width:62rem){.grid{grid-template-columns:minmax(0,1.15fr) minmax(20rem,.85fr);gap:1.5rem}}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);box-shadow:var(--shadow);
+  padding:clamp(1.25rem,3.5vw,2rem)}
+.card-head{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;margin-bottom:1.5rem}
+.card-head h2{margin:0;font-size:1.2rem;font-weight:700;letter-spacing:-.015em}
+.step{font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+
+.field{margin-bottom:1.375rem}
+.field:last-of-type{margin-bottom:0}
+.field label,.legend{display:flex;align-items:baseline;justify-content:space-between;gap:.5rem;margin-bottom:.4rem;
+  font-size:.875rem;font-weight:650}
+.hint{font-size:.75rem;font-weight:400;color:var(--muted)}
+.control{position:relative;display:flex;align-items:center}
+.control input{width:100%;min-height:48px;padding:.75rem 3.25rem .75rem .875rem;border:1px solid var(--line-strong);
+  border-radius:var(--r-ctl);background:var(--raised);color:var(--ink);font:inherit;font-size:1.05rem;
+  font-variant-numeric:tabular-nums;transition:border-color .12s}
+.control input:hover{border-color:var(--accent)}
+.control input:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent);outline:none}
+.unit{position:absolute;right:.875rem;font-size:.85rem;font-weight:650;color:var(--muted);pointer-events:none}
+.prefix{position:absolute;left:.875rem;font-size:.95rem;font-weight:650;color:var(--muted);pointer-events:none}
+.control.has-prefix input{padding-left:3.5rem;padding-right:.875rem}
+
+.cats{display:grid;gap:.75rem}
+@media(min-width:34rem){.cats{grid-template-columns:1fr 1fr}}
+.cat{position:relative;display:flex;flex-direction:column;gap:.25rem;min-height:44px;padding:.875rem 1rem;cursor:pointer;
+  border:1px solid var(--line-strong);border-radius:var(--r-ctl);background:var(--raised);transition:border-color .12s,background .12s}
+.cat:hover{border-color:var(--accent)}
+.cat input{position:absolute;opacity:0;width:1px;height:1px}
+.cat .t{display:flex;align-items:center;justify-content:space-between;gap:.5rem;font-weight:700;font-size:.95rem}
+.cat .d{font-size:.78rem;color:var(--muted)}
+.badge{font-size:.7rem;font-weight:700;color:var(--muted);border:1px solid var(--line-strong);border-radius:.4rem;padding:.1rem .4rem;white-space:nowrap}
+.cat:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+.cat:has(input:checked) .badge{color:var(--accent-deep);border-color:var(--accent)}
+html:not(.dark) .cat:has(input:checked) .badge{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 45%,white)}
+.cat:has(input:focus-visible){outline:3px solid var(--accent);outline-offset:2px}
+
+.row2{display:grid;gap:1rem}
+@media(min-width:34rem){.row2{grid-template-columns:minmax(0,1.6fr) minmax(7.5rem,1fr)}}
+.row2 .field{margin-bottom:0}
+select{width:100%;min-height:48px;padding:.75rem 2.25rem .75rem .875rem;border:1px solid var(--line-strong);border-radius:var(--r-ctl);
+  background:var(--raised) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2359655d' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right .75rem center;
+  color:var(--ink);font:inherit;appearance:none;cursor:pointer}
+
+.actions{display:flex;gap:.75rem;margin-top:1.75rem}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:.75rem 1.5rem;border-radius:var(--r-ctl);
+  font:inherit;font-weight:700;cursor:pointer;text-decoration:none;border:1px solid transparent;transition:background .12s}
+.btn-primary{flex:1;background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn-primary:hover{background:var(--accent-deep);border-color:var(--accent-deep)}
+.btn-ghost{background:transparent;border-color:var(--line-strong);color:var(--muted)}
+.btn-ghost:hover{color:var(--ink);border-color:var(--ink)}
+
+.result{position:relative;overflow:hidden}
+@media(min-width:62rem){.result{position:sticky;top:1.25rem}}
+.result .watermark{position:absolute;right:-3.5rem;top:-3.5rem;width:14rem;height:14rem;color:var(--accent);opacity:.06;pointer-events:none}
+.eyebrow{font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 .375rem}
+.amount{margin:0;font-size:clamp(2.6rem,7vw,3.6rem);font-weight:750;letter-spacing:-.035em;line-height:1;font-variant-numeric:tabular-nums}
+.amount small{font-size:1.1rem;font-weight:650;color:var(--muted);letter-spacing:0;margin-left:.4rem}
+.amount-note{margin:.5rem 0 0;font-size:.85rem;color:var(--muted)}
+
+.meter{margin:1.375rem 0 0}
+.meter .lab{display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted);margin-bottom:.375rem}
+.meter .track{height:8px;border-radius:99px;background:var(--accent-soft);overflow:hidden}
+.meter .fill{height:100%;width:70.8%;border-radius:99px;background:var(--accent)}
+.meter .ticks{position:relative;height:1.1rem}
+.meter .tick{position:absolute;top:2px;font-size:.68rem;color:var(--muted);transform:translateX(-50%);white-space:nowrap}
+.meter .tick::before{content:"";position:absolute;top:-.45rem;left:50%;width:1px;height:.35rem;background:var(--line-strong)}
+.tick.uruf{left:70.8%}
+.tick.total{left:100%}
+
+dl{margin:1.375rem 0 0;padding:1.125rem 0 0;border-top:1px solid var(--line);display:grid;gap:.625rem}
+.r{display:flex;align-items:baseline;gap:.5rem;font-size:.9rem}
+.r dt{color:var(--muted);white-space:nowrap}
+.r .dots{flex:1;border-bottom:1px dotted var(--line-strong);transform:translateY(-.25rem)}
+.r dd{margin:0;font-weight:650;font-variant-numeric:tabular-nums;white-space:nowrap}
+.r.total dd{color:var(--accent);font-weight:750;font-size:1rem}
+.note{margin:1.25rem 0 0;padding-top:1rem;border-top:1px solid var(--line);font-size:.78rem;color:var(--muted)}
+.note a{color:var(--accent);font-weight:650}
+
+footer{padding:1.25rem clamp(1rem,4vw,2.5rem);border-top:1px solid var(--line);color:var(--muted);font-size:.78rem;text-align:center}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <a class="brand" href="#">
+    <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M16 2.5 19 13l10.5 3L19 19l-3 10.5L13 19 2.5 16 13 13l3-10.5Z"/>
+      <path d="m16 8 1.7 6.3L24 16l-6.3 1.7L16 24l-1.7-6.3L8 16l6.3-1.7L16 8Z"/>
+    </svg>
+    Zakat Calculator
+  </a>
+  <nav aria-label="Primary">
+    <a class="navlink" aria-current="page" href="#">Calculator</a>
+    <a class="navlink" href="#">About</a>
+    <button class="toggle" id="theme" type="button" aria-pressed="false">Theme</button>
+  </nav>
+</header>
+
+<main>
+  <div class="intro">
+    <h1>Calculate Zakat on Gold</h1>
+    <p>Enter your gold weight, category, and current value to estimate your Zakat obligation.</p>
+  </div>
+
+  <div class="grid">
+    <section class="card" aria-label="Gold details">
+      <div class="card-head">
+        <h2>Your gold holdings</h2>
+        <span class="step">Step 1 of 1</span>
+      </div>
+
+      <div class="field">
+        <label for="w">Weight of gold <span class="hint">total grams you own</span></label>
+        <div class="control"><input id="w" class="num" type="text" inputmode="decimal" value="120" placeholder="0.00"><span class="unit">g</span></div>
+      </div>
+
+      <div class="field">
+        <span class="legend" id="cl">Gold category <span class="hint">sets the uruf exemption</span></span>
+        <div class="cats" role="radiogroup" aria-labelledby="cl">
+          <label class="cat"><input type="radio" name="c" checked>
+            <span class="t">Kept (savings) <span class="badge num">uruf 85 g</span></span>
+            <span class="d">Gold held as savings or investment</span>
+          </label>
+          <label class="cat"><input type="radio" name="c">
+            <span class="t">Worn (jewelry) <span class="badge num">uruf 200 g</span></span>
+            <span class="d">Gold worn as personal jewelry</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="row2">
+        <div class="field">
+          <label for="v">Value per gram <span class="hint">market price</span></label>
+          <div class="control has-prefix"><span class="prefix">RM</span><input id="v" class="num" type="text" inputmode="decimal" value="350.00"></div>
+        </div>
+        <div class="field">
+          <label for="cur">Currency</label>
+          <select id="cur"><option>MYR</option><option>USD</option><option>SGD</option><option>AED</option></select>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-primary" type="submit">Calculate Zakat</button>
+        <button class="btn btn-ghost" type="reset">Reset</button>
+      </div>
+    </section>
+
+    <aside class="card result" aria-label="Calculation result">
+      <svg class="watermark" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true">
+        <path d="M16 2.5 19 13l10.5 3L19 19l-3 10.5L13 19 2.5 16 13 13l3-10.5Z"/>
+        <path d="m16 8 1.7 6.3L24 16l-6.3 1.7L16 24l-1.7-6.3L8 16l6.3-1.7L16 8Z"/>
+      </svg>
+      <p class="eyebrow">Estimated Zakat due</p>
+      <p class="amount">306.25<small>MYR</small></p>
+      <p class="amount-note">After the 85 g uruf exemption for kept gold.</p>
+
+      <div class="meter" role="img" aria-label="Of 120 grams, 35 grams above the 85 gram uruf are zakatable">
+        <div class="lab"><span>Zakatable 35.00 g</span><span>Total 120.00 g</span></div>
+        <div class="track"><div class="fill"></div></div>
+        <div class="ticks"><span class="tick uruf">85 g uruf</span><span class="tick total">120 g</span></div>
+      </div>
+
+      <dl>
+        <div class="r"><dt>Uruf applied</dt><span class="dots"></span><dd class="num">85.00 g</dd></div>
+        <div class="r"><dt>Weight above uruf</dt><span class="dots"></span><dd class="num">35.00 g</dd></div>
+        <div class="r"><dt>Payable value</dt><span class="dots"></span><dd class="num">12,250.00 MYR</dd></div>
+        <div class="r total"><dt>Zakat due (2.5%)</dt><span class="dots"></span><dd class="num">306.25 MYR</dd></div>
+      </dl>
+
+      <p class="note">Malaysian uruf model, 2.5% rate. <a href="#">View methodology</a></p>
+    </aside>
+  </div>
+</main>
+
+<footer>No accounts. No tracking. Your inputs stay on this device.</footer>
+<script>
+const t=document.getElementById('theme');
+t.addEventListener('click',()=>{const d=document.documentElement.dataset.theme==='dark'?'light':'dark';
+document.documentElement.dataset.theme=d;t.setAttribute('aria-pressed',String(d==='dark'))});
+</script>
+</body>
+</html>

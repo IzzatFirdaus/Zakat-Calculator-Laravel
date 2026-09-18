@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>C — Focused Utility</title>
+<style>
+:root{
+  --bg:#f6f5f1; --card:#ffffff; --ink:#151b18; --soft:#5f6b64; --line:#e2e4de; --strong:#cbd0c8;
+  --go:#0a6b55; --go-ink:#ffffff; --go-soft:#e2f2ec; --danger:#b3261e;
+  --r:14px;
+}
+html[data-theme="dark"]{
+  --bg:#0b100e; --card:#151c18; --ink:#e8eee9; --soft:#96a49b; --line:#242e28; --strong:#39463e;
+  --go:#43d6a5; --go-ink:#04140d; --go-soft:#12332a;
+}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);
+  font:16px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;
+  padding-bottom:6.5rem}
+.num{font-variant-numeric:tabular-nums}
+:focus-visible{outline:3px solid var(--go);outline-offset:2px;border-radius:6px}
+
+.bar{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;
+  padding:.5rem clamp(1rem,4vw,2rem);background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.brand{display:flex;gap:.5rem;align-items:center;font-weight:700;font-size:.95rem;text-decoration:none;color:var(--ink)}
+.brand svg{width:22px;height:22px;color:var(--go)}
+.bar nav{display:flex;gap:.35rem;align-items:center}
+.bl{min-height:40px;display:inline-flex;align-items:center;padding:.35rem .7rem;border-radius:99px;font-size:.85rem;font-weight:600;color:var(--soft);text-decoration:none}
+.bl[aria-current]{background:var(--go-soft);color:var(--go)}
+.tgl{min-width:44px;min-height:40px;border:1px solid var(--strong);border-radius:99px;background:var(--card);color:var(--ink);cursor:pointer;font:inherit;font-weight:600;font-size:.85rem}
+
+main{width:min(100%,34rem);margin:0 auto;padding:1.5rem clamp(1rem,4vw,1.5rem)}
+h1{margin:.25rem 0 .25rem;font-size:1.45rem;font-weight:750;letter-spacing:-.02em}
+.sub{margin:0 0 1.5rem;color:var(--soft);font-size:.9rem}
+
+.step{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:1.25rem;margin-bottom:.875rem;box-shadow:0 1px 0 var(--line)}
+.step .head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.6rem}
+.step .head label,.step .head .legend{font-size:.85rem;font-weight:700}
+.step .head span.hint{font-size:.75rem;color:var(--soft);font-weight:400}
+
+.hero-input{width:100%;border:0;background:transparent;color:var(--ink);font:inherit;font-weight:780;
+  font-size:clamp(2.6rem,12vw,3.4rem);letter-spacing:-.03em;padding:.1rem 0;text-align:center;font-variant-numeric:tabular-nums}
+.hero-input:focus{outline:none}
+.hero-wrap{border:2px solid var(--strong);border-radius:var(--r);padding:.6rem 1rem;transition:border-color .12s;background:var(--card)}
+.hero-wrap:focus-within{border-color:var(--go)}
+.hero-unit{text-align:center;font-size:.75rem;color:var(--soft);margin-top:.15rem}
+
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+.tile{position:relative;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:.15rem;text-align:center;
+  padding:1rem .75rem;border:2px solid var(--line);border-radius:var(--r);transition:.12s;background:var(--card)}
+.tile input{position:absolute;opacity:0;width:1px;height:1px}
+.tile .ic{width:30px;height:30px;color:var(--soft)}
+.tile b{font-size:.9rem}
+.tile small{color:var(--soft);font-size:.72rem}
+.tile:hover{border-color:var(--strong)}
+.tile:has(input:checked){border-color:var(--go);background:var(--go-soft)}
+.tile:has(input:checked) .ic,.tile:has(input:checked) b{color:var(--go)}
+.tile:has(input:focus-visible){outline:3px solid var(--go);outline-offset:2px}
+
+.pair{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:.6rem}
+.mini{width:100%;min-height:48px;border:2px solid var(--strong);border-radius:10px;background:var(--card);color:var(--ink);
+  font:inherit;font-weight:650;font-size:1.05rem;padding:.5rem .75rem;font-variant-numeric:tabular-nums}
+.mini:focus{border-color:var(--go);outline:none}
+select.mini{font-weight:600;appearance:none;text-align:center;cursor:pointer}
+
+#result{display:none}
+#result.show{display:block;animation:rise .18s ease-out}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.out{border:2px solid var(--go);background:var(--card)}
+.out .big{text-align:center;padding:.75rem 0 .25rem}
+.out .big .a{margin:0;font-size:clamp(2.8rem,13vw,3.6rem);font-weight:790;letter-spacing:-.035em;color:var(--go);line-height:1;font-variant-numeric:tabular-nums}
+.out .big p{margin:.3rem 0 0;color:var(--soft);font-size:.8rem}
+.out .rows{margin-top:1rem;border-top:1px solid var(--line);padding-top:.4rem;font-size:.88rem}
+.out .r{display:flex;justify-content:space-between;padding:.45rem 0;border-bottom:1px solid var(--line)}
+.out .r:last-child{border-bottom:0}
+.out .r span:first-child{color:var(--soft)}
+.out .r b{font-variant-numeric:tabular-nums;font-weight:700}
+
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:6;display:flex;gap:.6rem;align-items:center;
+  padding:.75rem clamp(1rem,4vw,1.5rem) calc(.75rem + env(safe-area-inset-bottom));
+  background:color-mix(in srgb,var(--bg) 85%,transparent);backdrop-filter:blur(10px);border-top:1px solid var(--line)}
+.dock .sum{flex:1;min-width:0;font-size:.78rem;color:var(--soft)}
+.dock .sum b{display:block;color:var(--ink);font-size:.95rem;font-variant-numeric:tabular-nums}
+.go-btn{min-height:52px;padding:0 1.75rem;border:0;border-radius:12px;background:var(--go);color:var(--go-ink);
+  font:inherit;font-size:1rem;font-weight:750;cursor:pointer}
+.go-btn:active{transform:scale(.98)}
+.ghost{min-height:52px;padding:0 1rem;border:1px solid var(--strong);border-radius:12px;background:transparent;color:var(--soft);font:inherit;font-weight:650;cursor:pointer}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="bar">
+  <a class="brand" href="#">
+    <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M16 2.5 19 13l10.5 3L19 19l-3 10.5L13 19 2.5 16 13 13l3-10.5Z"/>
+    </svg>
+    Zakat
+  </a>
+  <nav aria-label="Primary">
+    <a class="bl" aria-current="page" href="#">Calculator</a>
+    <a class="bl" href="#">About</a>
+    <button class="tgl" id="theme" type="button" aria-pressed="false">◐</button>
+  </nav>
+</div>
+
+<main>
+  <h1>Gold Zakat</h1>
+  <p class="sub">Malaysian uruf model · 2.5% · nothing leaves this device</p>
+
+  <form onsubmit="return false">
+    <section class="step hero-wrap" style="border-radius:var(--r)">
+      <div class="head" style="justify-content:center"><label for="w" class="legend">Weight of your gold</label></div>
+      <input id="w" class="hero-input" type="text" inputmode="decimal" value="120" aria-describedby="wu">
+      <p id="wu" class="hero-unit">grams — 85 g kept / 200 g worn are exempt</p>
+    </section>
+
+    <section class="step">
+      <div class="head"><span class="legend">How do you hold it?</span></div>
+      <div class="tiles" role="radiogroup" aria-label="Category">
+        <label class="tile"><input type="radio" name="c" checked>
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7l8-4Z"/></svg>
+          <b>Kept</b><small>savings · uruf 85 g</small>
+        </label>
+        <label class="tile"><input type="radio" name="c">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="6"/><path d="M9 4h6l-1 4h-4L9 4Z"/></svg>
+          <b>Worn</b><small>jewelry · uruf 200 g</small>
+        </label>
+      </div>
+    </section>
+
+    <section class="step">
+      <div class="head"><label for="v">Value per gram</label><span class="hint">today's market price</span></div>
+      <div class="pair">
+        <input id="v" class="mini" type="text" inputmode="decimal" value="350">
+        <select class="mini" aria-label="Currency"><option>MYR</option><option>USD</option><option>SGD</option><option>AED</option></select>
+      </div>
+    </section>
+
+    <section class="step out" id="result" aria-live="polite">
+      <div class="big">
+        <p class="a">306.25</p>
+        <p>MYR estimated zakat due · 2.5% of 12,250.00</p>
+      </div>
+      <div class="rows">
+        <div class="r"><span>Uruf applied</span><b>85.00 g</b></div>
+        <div class="r"><span>Above uruf</span><b>35.00 g</b></div>
+        <div class="r"><span>Payable value</span><b>12,250.00 MYR</b></div>
+      </div>
+    </section>
+  </form>
+</main>
+
+<div class="dock">
+  <div class="sum"><b>120 g · Kept · @ 350 MYR</b>your inputs</div>
+  <button class="ghost" type="reset">Reset</button>
+  <button class="go-btn" id="calc" type="button">Calculate</button>
+</div>
+<script>
+const t=document.getElementById('theme');
+t.addEventListener('click',()=>{const d=document.documentElement.dataset.theme==='dark'?'light':'dark';
+document.documentElement.dataset.theme=d;t.setAttribute('aria-pressed',String(d==='dark'))});
+document.getElementById('calc').addEventListener('click',()=>{
+  const r=document.getElementById('result');r.classList.add('show');r.scrollIntoView({block:'nearest'})});
+</script>
+</body>
+</html>
