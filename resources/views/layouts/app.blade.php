@@ -36,6 +36,14 @@
         <nav class="app-header__nav" aria-label="{{ __('layout.primaryNav') }}">
             <a href="{{ route('calculator.index') }}" class="app-header__link @if (request()->routeIs('calculator.index')) app-header__link--active @endif" @if (request()->routeIs('calculator.index')) aria-current="page" @endif>{{ __('nav.calculator') }}</a>
             <a href="{{ route('calculator.about') }}" class="app-header__link @if (request()->routeIs('calculator.about')) app-header__link--active @endif" @if (request()->routeIs('calculator.about')) aria-current="page" @endif>{{ __('nav.about') }}</a>
+            <form action="{{ route('language.update') }}" method="GET" class="app-header__language" data-language-form>
+                <label class="sr-only" for="language-select">{{ __('layout.languageLabel') }}</label>
+                <select id="language-select" name="locale" class="app-header__select" data-language-select>
+                    <option value="en" @selected(app()->getLocale() === 'en')>English</option>
+                    <option value="ms" @selected(app()->getLocale() === 'ms')>Bahasa Melayu</option>
+                </select>
+                <button type="submit" class="app-header__toggle" data-language-submit>{{ __('layout.languageSubmit') }}</button>
+            </form>
             <button
                 type="button"
                 data-theme-toggle
@@ -51,7 +59,6 @@
                 <svg class="app-header__toggle-icon app-header__toggle-icon--moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
                 </svg>
-                <span>{{ __('layout.themeToggle') }}</span>
             </button>
         </nav>
     </header>
