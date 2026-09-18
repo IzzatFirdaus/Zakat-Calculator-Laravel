@@ -68,9 +68,11 @@
 | `base.css` | Lines 60–103 (`html`, `html.dark` color-scheme, `body`, `::selection`, `:focus-visible`, `button/input/select` font, tap-highlight) + 105–122 (`.skip-link*`) + 909–919 (`.sr-only`) + 949–962 (reduced-motion block) |
 | `header.css` | Lines 124–231 (all `.app-header*`) + the `.app-header` rules inside the `@media (max-width: 39.99rem)` block (921–940) |
 | `calculator.css` | Lines 248–317 (`.calculator-shell/intro/grid/form*`) + 319–394 (`.field*`, `.input`, `.select` core, `.field__error`) + 396–441 (`.error-summary*`) + 443–567 (`.category-*`, `.currency-grid`, `.select` arrow) + 569–616 (`.actions`, `.button-*`) + the `.calculator-form` box-shadow override inside the mobile media block (941–946) |
-| `result.css` | Lines 618–727 (`.calculator-result` … `.method-note`) + 875–902 (`.result-state*`) + 904–907 (`@keyframes spin`) |
-| `about.css` | Lines 729–873 (all `.methodology*`) |
+| `result.css` | Lines 618–727 (`.calculator-result` … `.method-note`) + 881–908 (`.result-state*`, shifted by the `.methodology__version` block) + `@keyframes spin` |
+| `about.css` | Lines 729–879 (all `.methodology*`, **including the newer `.methodology__version` rule**) |
 | `footer.css` | Lines 239–246 (`.app-footer`) |
+
+Line numbers are approximate as of commit `b06ab25`; **locate each block by its selector — the block list, not the numbering, is the contract**. The remaining after blocks: `.sr-only` at 915–925, mobile media block at 927–953, reduced-motion at 955–968.
 
 Do not edit any declaration values in this step. `@source` lines (3–5) and `@import 'tailwindcss';` (1) are deleted, not moved.
 
@@ -658,13 +660,15 @@ it('never formats money in the browser scripts', function () {
 - [ ] **Step 2: Create `resources/js/calculator/dom.ts`:**
 
 ```ts
-export function cloneTemplate(templateAttribute: string): HTMLElement | null {
-    const template = document.querySelector<HTMLTemplateElement>(`[${templateAttribute}]`);
+export function cloneTemplate(selector: string): HTMLElement | null {
+    const template = document.querySelector<HTMLTemplateElement>(selector);
     const child = template?.content.firstElementChild;
 
     return child ? (child.cloneNode(true) as HTMLElement) : null;
 }
 ```
+
+Call sites pass the full CSS attribute selector (e.g. `cloneTemplate('[data-result-loading-template]')`); the function uses it verbatim.
 
 - [ ] **Step 3: Create `resources/js/calculator/theme.ts`** — move `initThemeToggle()` verbatim from the current `calculator.ts` (lines 201–216), exported.
 
@@ -686,14 +690,14 @@ export class ErrorRenderer {
         });
     }
 
-    render(errors: FieldErrors, template: HTMLElement | null): void {
+    render(errors: FieldErrors, summaryTemplate: HTMLElement | null): void {
         this.clear();
 
         for (const [field, messages] of Object.entries(errors)) {
             this.markInvalid(field, messages[0] ?? '');
         }
 
-        const summary = template ? (template.cloneNode(true) as HTMLElement) : null;
+        const summary = summaryTemplate;
         const list = summary?.querySelector('ul');
 
         if (! summary || ! list) {
