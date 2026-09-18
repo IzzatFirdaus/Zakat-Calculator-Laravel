@@ -1,0 +1,55 @@
+:root {
+    --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+    --color-background: #f5f3ec;
+    --color-surface: #fffefa;
+    --color-surface-raised: #ffffff;
+    --color-foreground: #1c2723;
+    --color-muted: #526059;
+    --color-border: #d9ddd5;
+    --color-border-strong: #7e8c81;
+    --color-primary: #0b6b57;
+    --color-primary-hover: #075847;
+    --color-primary-soft: #e3f2ec;
+    --color-primary-foreground: #ffffff;
+    --color-danger: #a61b1b;
+    --color-danger-soft: #fdecec;
+    --color-danger-foreground: #5f1010;
+    --color-success: #0b6b57;
+    --color-success-soft: #e3f2ec;
+    --color-success-foreground: #0b4d3f;
+    --color-focus: #0b6b57;
+    --color-focus-ring: rgba(11, 107, 87, 0.28);
+    --color-shadow: rgba(28, 39, 35, 0.08);
+
+    --radius-control: 0.5rem;
+    --radius-panel: 0.75rem;
+    --shadow-panel: 0 10px 28px var(--color-shadow);
+
+    --meter-height: 8px;
+    --leader-gap: 0.5rem;
+    --watermark-opacity: 0.06;
+}
+
+html.dark {
+    --color-background: #0f1412;
+    --color-surface: #1a211d;
+    --color-surface-raised: #232c27;
+    --color-foreground: #edf2ee;
+    --color-muted: #a9b6ad;
+    --color-border: #35413a;
+    --color-border-strong: #6b7c71;
+    --color-primary: #34d399;
+    --color-primary-hover: #6ee7b7;
+    --color-primary-soft: #16382e;
+    --color-primary-foreground: #0f1412;
+    --color-danger: #ff8b8b;
+    --color-danger-soft: #3a1c1c;
+    --color-danger-foreground: #ffd7d7;
+    --color-success: #34d399;
+    --color-success-soft: #16382e;
+    --color-success-foreground: #a7f3d0;
+    --color-focus: #7ddfb8;
+    --color-focus-ring: rgba(125, 223, 184, 0.28);
+    --color-shadow: rgba(0, 0, 0, 0.24);
+}
