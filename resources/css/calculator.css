@@ -367,10 +367,3 @@ html.dark .select {
     background-color: var(--color-primary-soft);
     color: var(--color-primary);
 }
-
-@media (max-width: 39.99rem) {
-    .calculator-form,
-    .calculator-result {
-        box-shadow: none;
-    }
-}

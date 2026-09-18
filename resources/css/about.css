@@ -150,7 +150,11 @@
     font-size: 0.8125rem;
 }
 
+/* Kept last (as in the original app.css) so this override still follows the
+ * .calculator-form/.calculator-result rules in calculator.css/result.css. */
 @media (max-width: 39.99rem) {
+    .calculator-form,
+    .calculator-result,
     .methodology__card {
         box-shadow: none;
     }
