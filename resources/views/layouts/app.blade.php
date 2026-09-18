@@ -6,6 +6,7 @@
     <meta name="description" content="{{ __('meta.description') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', __('app.name'))</title>
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     @vite(['resources/css/app.css', 'resources/js/app.ts'])
     <script>
         (function () {
@@ -32,7 +33,7 @@
             </svg>
             <span>{{ __('app.name') }}</span>
         </a>
-        <nav class="app-header__nav" aria-label="Primary">
+        <nav class="app-header__nav" aria-label="{{ __('layout.primaryNav') }}">
             <a href="{{ route('calculator.index') }}" class="app-header__link @if (request()->routeIs('calculator.index')) app-header__link--active @endif" @if (request()->routeIs('calculator.index')) aria-current="page" @endif>{{ __('nav.calculator') }}</a>
             <a href="{{ route('calculator.about') }}" class="app-header__link @if (request()->routeIs('calculator.about')) app-header__link--active @endif" @if (request()->routeIs('calculator.about')) aria-current="page" @endif>{{ __('nav.about') }}</a>
             <button

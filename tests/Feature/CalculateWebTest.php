@@ -17,7 +17,9 @@ it('renders the calculator form with the empty state', function () {
         ->assertSee('Currency')
         ->assertSee('Calculate')
         ->assertSee('Enter your details to see your Zakat estimate.')
-        ->assertSee('No accounts. No tracking. Your inputs stay on this device.');
+        ->assertSee('No accounts. No tracking. Your inputs stay on this device.')
+        ->assertSee('aria-label="Primary"', false)
+        ->assertSee('<link rel="icon" type="image/svg+xml"', false);
 });
 
 it('resolves translation keys in rendered views', function () {
@@ -51,6 +53,7 @@ it('renders the about / methodology page', function () {
         ->assertSee('Disclaimer')
         ->assertSee('This tool provides an estimate only. Confirm calculations with a trusted scholar and use accurate gold prices for your jurisdiction and school of thought.')
         ->assertSee('https://github.com/IzzatFirdaus/Zakat-Calculator', false)
+        ->assertSee('Version 1.0 — Migrated from Android Zakat Gold Calculator')
         ->assertSee('<ol class="methodology__list"', false);
 });
 
@@ -156,6 +159,19 @@ it('rejects malformed decimal input with a field error', function () {
 
     $response->assertRedirect('/')
         ->assertSessionHasErrors('weight');
+});
+
+it('accepts a leading plus sign on decimal inputs', function () {
+    /** @var TestCase $this */
+    $response = $this->post('/calculate', [
+        'weight' => '+120',
+        'category' => 'kept',
+        'value' => '+350.5',
+        'currency' => 'MYR',
+    ]);
+
+    $response->assertStatus(200)
+        ->assertSee('306.69');
 });
 
 it('rejects negative weight with a field error', function () {

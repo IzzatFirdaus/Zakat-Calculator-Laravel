@@ -79,7 +79,7 @@ tests/
 └── (existing Pest.php, TestCase.php, Example tests, SkillAutomationTest)
 ```
 
-No new database migrations. No new config files (constants live in the domain, section 5). `resources/views/welcome.blade.php` is an unused scaffold leftover kept for reference; the calculator never routes to it.
+No new database migrations. No new config files (constants live in the domain, section 5). The stock `resources/views/welcome.blade.php` scaffold was deleted in the reconciliation pass; the calculator never routed to it.
 
 ---
 

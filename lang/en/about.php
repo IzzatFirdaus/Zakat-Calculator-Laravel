@@ -15,5 +15,6 @@ return [
     'formulaExample' => 'Example: 120 g of kept gold at 350.00 per gram leaves 35 g above the 85 g uruf, so the payable value is 12,250.00 and the Zakat due is 306.25.',
     'disclaimerTitle' => 'Disclaimer',
     'source' => 'Android reference: Zakat Gold Calculator',
+    'versionNote' => 'Version 1.0 — Migrated from Android Zakat Gold Calculator',
     'disclaimer' => 'This tool provides an estimate only. Confirm calculations with a trusted scholar and use accurate gold prices for your jurisdiction and school of thought.',
 ];

@@ -15,6 +15,8 @@ A lightweight **web application** that helps Muslim users estimate their **Zakat
 
 This product is a direct web migration of an existing Android app. All v1.0 behavior must remain faithful to the original calculation model, which was validated and published. The web version adds two extensions the platform enables: currency selection (the Android app was hard-coded to RM) and fully responsive desktop/mobile layout. No calculation semantics change.
 
+**Which Android behavior is authoritative.** The Android repository contains two contradictory calculation models. The shipped one — inline `double` math in `MainActivity` using the uruf subtraction model `(weight − 85|200) × price` — is the reference for this migration and is what the web app implements (with `BigDecimal` precision). The separate `domain/` package (a nisab-threshold-on-full-weight model and its tests) is dead code: it is never invoked from the UI, contradicts the shipped behavior (e.g., 100 g kept @ 60 → 22.50 zakat due under the shipped/web model, vs. the dead tests' assertion of 6000.00 payable and 150.00 zakat due), and must not be treated as a spec or "restored" in future work.
+
 ### 1.3 Target Audience
 
 - Practicing Muslims (Sunni and Shia) seeking a quick, trustworthy Zakat estimate on gold holdings.
@@ -58,6 +60,7 @@ This product is a direct web migration of an existing Android app. All v1.0 beha
 - Multi-language localization (English only in v1.0; architecture must keep strings centralized).
 - Push or email notifications for Zakat due dates.
 - School-of-thought presets beyond the standard uruf model (Hanafi/Shafi'i variants are future work).
+- The Android "Share App" system share sheet. Sharing is an OS-level affordance with no web equivalent in a stateless calculator; it is explicitly out of scope for this web iteration (no Web Share API button in v1.0).
 
 ### 2.3 Future Considerations (post-v1.0)
 

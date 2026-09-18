@@ -20,6 +20,34 @@ it('matches the Android reference golden values', function () {
         ->and($result->zakatDue->toString())->toBe('306.25');
 });
 
+it('matches the Android reference golden values for worn gold', function () {
+    $input = new ZakatInput(
+        weightGrams: BigDecimal::of('210'),
+        category: GoldCategory::WORN,
+        valuePerGram: BigDecimal::of('350'),
+        currencyCode: 'MYR',
+    );
+    $result = ZakatCalculator::calculate($input, new StandardUrufRule);
+
+    expect($result->weightMinusUruf->toScale(2)->toString())->toBe('10.00')
+        ->and($result->payableValue->toScale(2)->toString())->toBe('3500.00')
+        ->and($result->zakatDue->toString())->toBe('87.50');
+});
+
+it('returns zero payable at the exact 200 gram worn uruf boundary', function () {
+    $input = new ZakatInput(
+        weightGrams: BigDecimal::of('200'),
+        category: GoldCategory::WORN,
+        valuePerGram: BigDecimal::of('350'),
+        currencyCode: 'MYR',
+    );
+    $result = ZakatCalculator::calculate($input, new StandardUrufRule);
+
+    expect($result->belowUruf)->toBeTrue()
+        ->and($result->payableValue->toString())->toBe('0')
+        ->and($result->zakatDue->toString())->toBe('0.00');
+});
+
 it('rounds the final zakat to 2 decimals with HALF_UP at the last step', function () {
     $input = new ZakatInput(
         weightGrams: BigDecimal::of('145'),

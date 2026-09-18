@@ -45,8 +45,8 @@ final class CalculateZakatRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'weight' => ['required', 'string', 'regex:/^-?(?:\d+(?:\.\d+)?|\.\d+)$/', 'numeric', 'gt:0', 'max:1000000'],
-            'value' => ['required', 'string', 'regex:/^-?(?:\d+(?:\.\d+)?|\.\d+)$/', 'numeric', 'gt:0', 'max:10000000'],
+            'weight' => ['required', 'string', 'regex:/^[+-]?(?:\d+(?:\.\d+)?|\.\d+)$/', 'numeric', 'gt:0', 'max:1000000'],
+            'value' => ['required', 'string', 'regex:/^[+-]?(?:\d+(?:\.\d+)?|\.\d+)$/', 'numeric', 'gt:0', 'max:10000000'],
             'category' => ['required', 'in:kept,worn'],
             'currency' => ['required', 'in:'.implode(',', self::SUPPORTED_CURRENCIES)],
         ];

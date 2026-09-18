@@ -47,6 +47,8 @@
             </p>
 
             <a class="methodology__source" href="https://github.com/IzzatFirdaus/Zakat-Calculator" target="_blank" rel="noopener">{{ __('about.source') }}</a>
+
+            <p class="methodology__version">{{ __('about.versionNote') }}</p>
         </div>
     </div>
 </div>

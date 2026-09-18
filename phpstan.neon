@@ -1,5 +1,9 @@
 includes:
     - vendor/larastan/larastan/extension.neon
+    # Baseline for pre-existing issues — regenerate with:
+    #   vendor/bin/phpstan analyse --generate-baseline
+    # Zero new errors are allowed beyond this baseline.
+    - phpstan-baseline.neon
 
 parameters:
     paths:
@@ -16,8 +20,3 @@ parameters:
 
     # Ignore legacy/third-party noise; new code must be clean at level 6.
     ignoreErrors:
-
-    # Baseline for pre-existing issues — regenerate with:
-    #   vendor/bin/phpstan analyse --generate-baseline
-    # Zero new errors are allowed beyond this baseline.
-    # baseline: phpstan-baseline.neon

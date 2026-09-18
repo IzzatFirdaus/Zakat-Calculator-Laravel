@@ -872,6 +872,12 @@ html.dark .select {
     text-underline-offset: 0.18em;
 }
 
+.methodology__version {
+    margin: 0.5rem 0 0;
+    color: var(--color-muted);
+    font-size: 0.8125rem;
+}
+
 .result-state {
     display: flex;
     align-items: flex-start;
