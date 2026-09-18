@@ -271,7 +271,7 @@
     transform: scale(1);
 }
 
-.category-option input:focus-visible ~ .category-option__indicator {
+.category-option:has(input:focus-visible) {
     outline: 3px solid var(--color-focus);
     outline-offset: 2px;
 }
@@ -366,4 +366,68 @@ html.dark .select {
     border-color: var(--color-primary);
     background-color: var(--color-primary-soft);
     color: var(--color-primary);
+}
+
+.control {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.control .input {
+    padding-right: 2.5rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.control--prefixed .input {
+    padding-left: 3.5rem;
+    padding-right: 0.75rem;
+}
+
+.control__unit,
+.control__prefix {
+    position: absolute;
+    font-size: 0.875rem;
+    font-weight: 650;
+    color: var(--color-muted);
+    pointer-events: none;
+}
+
+.control__unit {
+    right: 0.875rem;
+}
+
+.control__prefix {
+    left: 0.875rem;
+}
+
+.category-option:has(input:checked) {
+    border-color: var(--color-primary);
+    background-color: var(--color-primary-soft);
+}
+
+.category-option__title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.category-option__badge {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--color-muted);
+    border: 1px solid var(--color-border-strong);
+    border-radius: 0.4rem;
+    padding: 0.1rem 0.4rem;
+    white-space: nowrap;
+}
+
+.category-option:has(input:checked) .category-option__badge {
+    color: var(--color-primary);
+    border-color: currentcolor;
+}
+
+.num {
+    font-variant-numeric: tabular-nums;
 }

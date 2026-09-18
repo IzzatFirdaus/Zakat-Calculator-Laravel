@@ -49,18 +49,21 @@
 
                 <div class="field" data-field="weight">
                     <label for="weight" class="field__label">{{ __('calculator.weightLabel') }}</label>
-                    <input
-                        type="text"
-                        id="weight"
-                        name="weight"
-                        value="{{ old('weight') }}"
-                        placeholder="{{ __('calculator.weightPlaceholder') }}"
-                        class="input @error('weight') input--error @enderror"
-                        inputmode="decimal"
-                        autocomplete="off"
-                        aria-describedby="weight-help @error('weight') weight-error @enderror"
-                        @if ($errors->has('weight')) aria-invalid="true" @endif
-                    >
+                    <div class="control">
+                        <input
+                            type="text"
+                            id="weight"
+                            name="weight"
+                            value="{{ old('weight') }}"
+                            placeholder="{{ __('calculator.weightPlaceholder') }}"
+                            class="input @error('weight') input--error @enderror"
+                            inputmode="decimal"
+                            autocomplete="off"
+                            aria-describedby="weight-help @error('weight') weight-error @enderror"
+                            @if ($errors->has('weight')) aria-invalid="true" @endif
+                        >
+                        <span class="control__unit" aria-hidden="true">{{ __('calculator.unitGramShort') }}</span>
+                    </div>
                     <p id="weight-help" class="field__help">{{ __('calculator.weightHelp') }}</p>
                     @error('weight')
                         <p id="weight-error" class="field__error" role="alert" data-field-error>{{ $message }}</p>
@@ -74,7 +77,10 @@
                             <input type="radio" name="category" value="kept" {{ old('category', 'kept') === 'kept' ? 'checked' : '' }}>
                             <span class="category-option__indicator" aria-hidden="true"></span>
                             <span class="category-option__content">
-                                <span class="category-option__title">{{ __('calculator.categoryKept') }}</span>
+                                <span class="category-option__title-row">
+                                    <span class="category-option__title">{{ __('calculator.categoryKept') }}</span>
+                                    <span class="category-option__badge num">{{ __('calculator.categoryKeptUruf') }}</span>
+                                </span>
                                 <span class="category-option__description">{{ __('calculator.keptDescription') }}</span>
                             </span>
                         </label>
@@ -82,7 +88,10 @@
                             <input type="radio" name="category" value="worn" {{ old('category') === 'worn' ? 'checked' : '' }}>
                             <span class="category-option__indicator" aria-hidden="true"></span>
                             <span class="category-option__content">
-                                <span class="category-option__title">{{ __('calculator.categoryWorn') }}</span>
+                                <span class="category-option__title-row">
+                                    <span class="category-option__title">{{ __('calculator.categoryWorn') }}</span>
+                                    <span class="category-option__badge num">{{ __('calculator.categoryWornUruf') }}</span>
+                                </span>
                                 <span class="category-option__description">{{ __('calculator.wornDescription') }}</span>
                             </span>
                         </label>
@@ -95,18 +104,21 @@
                 <div class="currency-grid">
                     <div class="field field--compact" data-field="value">
                         <label for="value" class="field__label">{{ __('calculator.valueLabel') }}</label>
-                        <input
-                            type="text"
-                            id="value"
-                            name="value"
-                            value="{{ old('value') }}"
-                            placeholder="{{ __('calculator.valuePlaceholder') }}"
-                            class="input @error('value') input--error @enderror"
-                            inputmode="decimal"
-                            autocomplete="off"
-                            aria-describedby="value-help @error('value') value-error @enderror"
-                            @if ($errors->has('value')) aria-invalid="true" @endif
-                        >
+                        <div class="control control--prefixed">
+                            <span class="control__prefix" aria-hidden="true" data-currency-prefix>{{ old('currency', 'MYR') }}</span>
+                            <input
+                                type="text"
+                                id="value"
+                                name="value"
+                                value="{{ old('value') }}"
+                                placeholder="{{ __('calculator.valuePlaceholder') }}"
+                                class="input @error('value') input--error @enderror"
+                                inputmode="decimal"
+                                autocomplete="off"
+                                aria-describedby="value-help @error('value') value-error @enderror"
+                                @if ($errors->has('value')) aria-invalid="true" @endif
+                            >
+                        </div>
                         <p id="value-help" class="field__help">{{ __('calculator.valueHelp') }}</p>
                         @error('value')
                             <p id="value-error" class="field__error" role="alert" data-field-error>{{ $message }}</p>
@@ -137,7 +149,7 @@
                     <button type="submit" data-submit-text="{{ __('calculator.submit') }}" data-submitting-text="{{ __('calculator.submitting') }}" class="button-primary">
                         {{ __('calculator.submit') }}
                     </button>
-                    <a href="{{ route('calculator.index') }}" class="button-secondary">{{ __('calculator.reset') }}</a>
+                    <a href="{{ route('calculator.index') }}" class="button-secondary" data-calculator-reset>{{ __('calculator.reset') }}</a>
                 </div>
             </form>
         </div>

@@ -1,5 +1,7 @@
 <?php
 
+use App\Domain\Zakat\GoldCategory;
+use App\Domain\Zakat\StandardUrufRule;
 use Tests\TestCase;
 
 it('renders the calculator form with the empty state', function () {
@@ -371,13 +373,16 @@ it('renders high-precision inputs with rounded display values', function () {
         ->assertSee('311.22');
 });
 
-it('never formats money in the browser script', function () {
-    $script = (string) file_get_contents(resource_path('js/calculator.ts'));
+it('never formats money in the browser scripts', function () {
+    $scripts = collect(glob(resource_path('js/*.ts')))
+        ->merge(glob(resource_path('js/calculator/*.ts')))
+        ->map(fn (string $path) => (string) file_get_contents($path))
+        ->implode("\n");
 
-    expect($script)->not->toContain('toFixed')
-        ->and($script)->not->toContain('Intl.NumberFormat')
-        ->and($script)->not->toContain('parseFloat')
-        ->and($script)->not->toContain('parseInt');
+    expect($scripts)->not->toContain('toFixed')
+        ->and($scripts)->not->toContain('Intl.NumberFormat')
+        ->and($scripts)->not->toContain('parseFloat')
+        ->and($scripts)->not->toContain('parseInt');
 });
 
 it('formats upper-bound results with thousands separators', function () {
@@ -393,4 +398,52 @@ it('formats upper-bound results with thousands separators', function () {
         ->assertSee('999,915.00 g')
         ->assertSee('349,970,250.00 MYR')
         ->assertSee('8,749,256.25');
+});
+
+it('surfaces uruf badges matching the rule thresholds', function () {
+    /** @var TestCase $this */
+    $rule = new StandardUrufRule;
+    $kept = $rule->urufFor(GoldCategory::KEPT)->toInt();
+    $worn = $rule->urufFor(GoldCategory::WORN)->toInt();
+
+    $this->get('/')->assertSee("uruf {$kept} g", false)->assertSee("uruf {$worn} g", false);
+});
+
+it('renders unit affordances on the numeric inputs', function () {
+    /** @var TestCase $this */
+    $content = $this->get('/')->getContent();
+
+    expect($content)->toContain('class="control__unit"')
+        ->and($content)->toContain('data-currency-prefix')
+        ->and($content)->toContain('MYR');
+});
+
+it('renders the zakatable meter geometry for above-uruf results', function () {
+    /** @var TestCase $this */
+    $response = $this->post('/calculate', [
+        'weight' => '120', 'category' => 'kept', 'value' => '350', 'currency' => 'MYR',
+    ]);
+
+    // 35 / 120 = 29.17% zakatable; uruf tick at 85 / 120 = 70.83%
+    $response->assertStatus(200)
+        ->assertSee('--meter-width:29.17%', false)
+        ->assertSee('--meter-tick:70.83%', false);
+});
+
+it('hides the meter for below-uruf results', function () {
+    /** @var TestCase $this */
+    $content = $this->post('/calculate', [
+        'weight' => '50', 'category' => 'kept', 'value' => '350', 'currency' => 'MYR',
+    ])->getContent();
+
+    expect($content)->not->toContain('class="meter"');
+});
+
+it('labels the meter for screen readers with the result figures', function () {
+    /** @var TestCase $this */
+    $content = $this->post('/calculate', [
+        'weight' => '120', 'category' => 'kept', 'value' => '350', 'currency' => 'MYR',
+    ])->getContent();
+
+    expect($content)->toContain('aria-label="Of 120.00 grams entered, 35.00 grams above the 85.00 gram uruf are zakatable."');
 });
