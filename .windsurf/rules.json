@@ -1,0 +1,56 @@
+{
+  "version": "1.0",
+  "project_name": "Laravel App with Skill Automation",
+  "automation": {
+    "enabled": true,
+    "skill_system": {
+      "registry": ".agents/skills.json",
+      "config": ".agents/config.json",
+      "auto_invoke": true,
+      "auto_invoke_threshold": 0.60
+    }
+  },
+  "rules": [
+    {
+      "id": "auto_skill_discovery",
+      "name": "Auto-Discover and Invoke Skills",
+      "applies_to": "All development tasks",
+      "procedure": [
+        "Parse the user's task",
+        "Load .agents/skills.json",
+        "Match skills using keyword, file type, category, and regex patterns",
+        "Score relevance (0-1)",
+        "Show matched skills to user with scores",
+        "Execute matched skills via php artisan skill:manage execute",
+        "Report results"
+      ],
+      "required": true,
+      "confirmation_required": false
+    },
+    {
+      "id": "always_disclose",
+      "name": "Always Show Skill Usage",
+      "applies_to": "Before executing any skill",
+      "procedure": "Display: 📋 Matched Skills: [list with scores]",
+      "required": true
+    },
+    {
+      "id": "execute_without_asking",
+      "name": "Execute Automatically",
+      "applies_to": "After disclosure",
+      "procedure": [
+        "Execute matched skills immediately",
+        "Do NOT ask 'Would you like me to...?'",
+        "Do NOT ask 'Should I proceed?'",
+        "Show execution output"
+      ],
+      "required": true
+    }
+  ],
+  "disabled_when_user_says": [
+    "Don't use skills",
+    "Do it manually",
+    "Skip automation",
+    "Disable skill automation"
+  ]
+}

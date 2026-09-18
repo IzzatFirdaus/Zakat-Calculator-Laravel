@@ -1,0 +1,10 @@
+{
+  "$schema": "https://app.kilo.ai/config.json",
+  "mcp": {
+    "typesafe": {
+      "type": "local",
+      "command": ["python", "D:/Projects/app/.agents/skills/jev-eval/mcp_server.py"],
+      "enabled": true
+    }
+  }
+}

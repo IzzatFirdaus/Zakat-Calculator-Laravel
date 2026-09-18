@@ -1,0 +1,117 @@
+# Project Automation Rules - REQUIRED FOR ALL AGENT SESSIONS
+# This file is automatically loaded by compatible agents on session start
+
+version: "1.0"
+project_type: "laravel"
+automation_enabled: true
+
+initialization:
+  on_session_start:
+    - action: "load_skill_system"
+      path: ".agents/"
+      description: "Load Laravel skill automation framework from .agents/"
+    - action: "inform_user"
+      message: "Skill automation ready. Will auto-invoke skills for development tasks."
+
+rules:
+  - id: "skill_auto_discovery"
+    name: "Auto-Discover & Invoke Skills"
+    priority: "high"
+    trigger: "Any development or Laravel-related task"
+    activation: "AUTOMATIC - do not ask permission"
+
+    procedure: |
+      FOR EVERY USER TASK:
+      1. Parse task description
+      2. Load .agents/skills.json via SkillRegistry
+      3. Match skills using SkillMatcher (keyword, file type, category, regex patterns)
+      4. DISCLOSE: Show matched skills with relevance scores
+      5. Resolve dependencies
+      6. EXECUTE: Run matched skills via SkillExecutor (php artisan or vendor binary)
+      7. REPORT: Show execution results, file paths created, success/failure status
+
+      ALWAYS show:
+      - Which skills matched and their relevance (e.g., "model_create: 0.95")
+      - Execution order if multiple skills
+      - Actual command being run
+      - Output/results from each skill
+
+    activation_threshold: 0.60
+    min_skills_to_auto_invoke: 1
+    max_sequential_skills: 10
+    confirmation_required: false
+
+    examples:
+      - task: "Create a User model"
+        skills_invoked: ["model_create"]
+        disclosure: "📋 Found 1 skill: model_create (0.98)"
+
+      - task: "Create a new API resource for products"
+        skills_invoked: ["api_resource_create", "controller_create", "request_create"]
+        disclosure: "📋 Found 3 skills matching your task..."
+
+      - task: "Create a migration for users table"
+        skills_invoked: ["migration_create"]
+        disclosure: "📋 Found 1 skill: migration_create (0.70)"
+
+  - id: "skill_execution_mode"
+    name: "Execution Without Asking"
+    priority: "critical"
+    description: "Once skills are disclosed, execute them immediately - do not ask for confirmation"
+    rules:
+      - "Never say 'Would you like me to...?'"
+      - "Never ask 'Should I proceed?'"
+      - "Execute skills automatically and report results"
+      - "Exception: Only ask if skill requires user input and .args.interactive = true"
+
+  - id: "error_handling"
+    name: "Graceful Fallback on Skill Errors"
+    procedure: |
+      IF skill execution fails:
+      1. Log error to storage/logs/skill_automation.log
+      2. Attempt retry (configured in .agents/config.json)
+      3. If still fails, fall back to manual approach
+      4. Inform user of failure and fallback action taken
+
+  - id: "transparency"
+    name: "Always Show Skill Usage"
+    procedure: |
+      Display format:
+
+      📋 Matched Skills:
+      - skill_name (relevance: X%) — description
+
+      🔧 Executing:
+      - Running: [artisan command or action]
+      - Status: SUCCESS/FAILED
+      - Output: [command output]
+
+      ✅ Complete: [summary of what was created/changed]
+
+logging:
+  channel: "skill_automation"
+  log_file: "storage/logs/skill_automation.log"
+  log_invocations: true
+  log_execution_time: true
+  log_errors: true
+
+configuration_files:
+  - ".agents/config.json" — automation thresholds and settings
+  - ".agents/skills.json" — complete skill registry (24 Laravel skills)
+  - "app/Services/SkillRegistry.php" — skill loading/parsing
+  - "app/Services/SkillMatcher.php" — skill matching logic
+  - "app/Services/SkillExecutor.php" — skill execution engine
+  - "app/Console/Commands/ManageSkills.php" — artisan commands
+  - "tests/Feature/SkillAutomationTest.php" — automated tests
+
+agent_compatibility:
+  - "GitHub Copilot (with .copilot/instructions.md)"
+  - "Codeium Windsurf (with .windsurf/rules.json)"
+  - "Claude (with custom instructions)"
+  - "Any LLM agent reading .agentrules"
+
+override_commands:
+  - "Don't use skills for this task" → Bypass automation for that task
+  - "Use only [skill_name]" → Restrict to specific skill
+  - "Show me the skill [skill_name]" → Display skill definition
+  - "Disable skill automation" → Turn off for current session only
